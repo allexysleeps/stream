@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>stream</title>
+    <style>
+        video {
+            width: 100%;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <button id="start">Start stream</button><br/>
+        <video autoplay playsinline/>
+    </div>
+    <script>
+      function startCapture(displayMediaOptions) {
+          try {
+            return navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+          } catch (e) {
+            console.log(e)
+            return null
+          }
+      }
+
+      document.getElementById('start').addEventListener('click', () => {
+        startCapture({video: true}).then((s) => {
+          const conn = new WebSocket("ws://" + document.location.host + "/stream")
+          // conn.emit('stream', s)
+
+          const video = document.querySelector('video');
+          video.srcObject = s;
+
+          conn.onclose = function () {
+            console.log('Connection closed')
+          };
+        })
+      })
+    </script>
+</body>
+</html>
